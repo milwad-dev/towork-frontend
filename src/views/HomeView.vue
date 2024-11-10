@@ -1,41 +1,51 @@
 <script setup>
-window.onload = function () {
-    bootlint.showLintReportForCurrentDocument([], {
-        hasProblems: false,
-        problemFree: false
-    });
+    import axios from 'axios';
+    import { onMounted, ref } from 'vue'
 
-    $('[data-toggle="tooltip"]').tooltip();
+    let tasks = ref([]);
 
-    function formatDate(date) {
-        return (
-            date.getDate() +
-            "/" +
-            (date.getMonth() + 1) +
-            "/" +
-            date.getFullYear()
-        );
-    }
+    onMounted(() => {
+        axios.get('/tasks').then((response) => {
+            tasks.value = response.data.data
+        });
+    })
+// window.onload = function () {
+//     bootlint.showLintReportForCurrentDocument([], {
+//         hasProblems: false,
+//         problemFree: false
+//     });
 
-    var currentDate = formatDate(new Date());
+//     $('[data-toggle="tooltip"]').tooltip();
 
-    $(".due-date-button").datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true,
-        todayHighlight: true,
-        startDate: currentDate,
-        orientation: "bottom right"
-    });
+//     function formatDate(date) {
+//         return (
+//             date.getDate() +
+//             "/" +
+//             (date.getMonth() + 1) +
+//             "/" +
+//             date.getFullYear()
+//         );
+//     }
 
-    $(".due-date-button").on("click", function (event) {
-        $(".due-date-button")
-            .datepicker("show")
-            .on("changeDate", function (dateChangeEvent) {
-                $(".due-date-button").datepicker("hide");
-                $(".due-date-label").text(formatDate(dateChangeEvent.date));
-            });
-    });
-};
+//     var currentDate = formatDate(new Date());
+
+//     $(".due-date-button").datepicker({
+//         format: "dd/mm/yyyy",
+//         autoclose: true,
+//         todayHighlight: true,
+//         startDate: currentDate,
+//         orientation: "bottom right"
+//     });
+
+//     $(".due-date-button").on("click", function (event) {
+//         $(".due-date-button")
+//             .datepicker("show")
+//             .on("changeDate", function (dateChangeEvent) {
+//                 $(".due-date-button").datepicker("hide");
+//                 $(".due-date-label").text(formatDate(dateChangeEvent.date));
+//             });
+//     });
+// };
 
 </script>
 
@@ -95,7 +105,7 @@ window.onload = function () {
     <div class="row mx-1 px-5 pb-3 w-80">
         <div class="col mx-auto">
             <!-- Todo Item 1 -->
-            <div class="row px-3 align-items-center todo-item rounded">
+            <div class="row px-3 align-items-center todo-item rounded" v-for="task in tasks" v-if="tasks">
                 <div class="col-auto m-1 p-0 d-flex align-items-center">
                     <h2 class="m-0 p-0">
                         <i class="fa fa-square-o text-primary btn m-0 p-0 d-none" data-toggle="tooltip" data-placement="bottom" title="Mark as complete"></i>
@@ -103,7 +113,13 @@ window.onload = function () {
                     </h2>
                 </div>
                 <div class="col px-1 m-1 d-flex align-items-center">
-                    <input type="text" class="form-control form-control-lg border-0 edit-todo-input bg-transparent rounded px-3" readonly value="Buy groceries for next week" title="Buy groceries for next week" />
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg border-0 edit-todo-input bg-transparent rounded px-3" 
+                        readonly 
+                        :value="task.title" 
+                        :title="task.title" 
+                    />
                     <input type="text" class="form-control form-control-lg border-0 edit-todo-input rounded px-3 d-none" value="Buy groceries for next week" />
                 </div>
                 <div class="col-auto m-1 p-0 px-3 d-none">
